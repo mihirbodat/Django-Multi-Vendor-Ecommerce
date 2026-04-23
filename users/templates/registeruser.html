@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width , initial-scale=1.0">
+    <title>Signup</title>
+</head>
+
+<body>
+    <form action="{% url 'registeruser' %}" method="POST">
+        {% csrf_token %}
+
+        <fieldset>
+            <legend>SIGN-UP FORM</legend>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div><input type="text" name="username" placeholder="USERNAME" required autocomplete="off"></div>
+
+            <div><input type="email" name="email" placeholder="E-MAIL" required autocomplete="off"></div>
+
+            <div><input type="password" name="password" placeholder="PASSWORD" required autocomplete="new-password"></div>
+
+            <div>
+                <select name="role" required>
+                    <option value="" selected>-- Select Role --</option>
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                </select>
+            </div>
+
+            <div id="shop_name_div" style="display: none">
+                <input type="text" name="shop_name" placeholder="SHOP NAME">
+            </div>
+
+            <div><button type="submit">Register</button></div>
+        </fieldset>
+    </form>
+
+    <script>
+        const role = document.getElementsByName('role')[0]
+        const shopDiv = document.getElementById('shop_name_div')
+
+        role.addEventListener('change', function () {
+            if (this.value === 'seller') {
+                shopDiv.style.display = 'block'
+            } else {
+                shopDiv.style.display = 'none'
+            }
+        })
+    </script>
+</body>
+
+</html>

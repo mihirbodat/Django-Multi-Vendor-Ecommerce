@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form action="{% url 'loginuser' %}" method="POST">
+        {% csrf_token %}
+
+        <fieldset>
+            <legend>LOG-IN FORM</legend>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div><input type="text" name="username" placeholder="USERNAME" required></div>
+            <div><input type="password" name="password" placeholder="PASSWORD" required></div>
+            <div><button type="submit">Log-In</button></div>
+        </fieldset>
+
+        <div><h3>New User? <a href="{% url 'registeruser' %}">SIGN-UP</a></h3></div>
+
+    </form>
+</body>
+</html>
