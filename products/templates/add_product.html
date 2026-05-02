@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add-Product</title>
+</head>
+<body>
+    <form action="{% url 'add_product' %}" method="POST">
+        <fieldset>
+            {% csrf_token %}
+            <legend>ADD-PRODUCT</legend>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-box">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div><input type="text" name="name" placeholder="NAME" required></div>
+
+            <div><textarea name="description" placeholder="DESCRIPTION" rows="4" required></textarea></div>
+
+            <div><input type="number" name="price" placeholder="0.00" step="0.01" min="1" required></div>
+
+            <div><input type="number" name="stock" placeholder="STOCK" min="1" required></div>
+
+            <div>
+                <select name="category" required>
+                    <option value="" selected>-- Select Category --</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.category_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div><input type="file" name="image" placeholder="SELECT-IMAGE" accept=".jpg , .png , .jpeg"></div>
+
+            <div><button type="submit">Add Product</button></div>
+            
+        </fieldset>
+    </form>
+</body>
+</html>

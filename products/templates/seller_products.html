@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller-Products</title>
+</head>
+
+<body>
+
+    <form action="search_product" method="GET">
+        {% csrf_token %}
+        <input type="search" name="product_name" placeholder="Search Product">
+        <input type="submit">
+    </form>
+
+    <table border="1" style="border-spacing: 10px 15px;">
+        <tr>
+            <th>Product-Name</th>
+            <th>Stock</th>
+            <th>Edit-Product</th>
+            <th>Delete-Product</th>
+        </tr>
+
+        {% for product in products %}
+            <tr>
+                <td>{{ product.product_name }}</td>
+                <td>{{ product.product_stock }}</td>
+                <td>
+                    <a href="edit_product/{{ product.id }}">Edit</a>
+                </td>
+                <td>
+                    <a href="delete_product/{{ product.id }}">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </table>
+</body>
+
+</html>

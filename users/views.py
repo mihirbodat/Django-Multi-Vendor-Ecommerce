@@ -47,7 +47,7 @@ def loginuser(request):
 
             login(request , user)  # create session_key
 
-            if hasattr(user , 'SellerProfile'):          #check relations
+            if hasattr(user , 'sellerprofile'):          #check relations
                 return redirect('seller_dashboard')
             else:
                 return redirect('home')

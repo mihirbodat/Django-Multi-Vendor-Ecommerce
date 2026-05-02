@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit-Product</title>
+</head>
+
+<body>
+
+    <form action="/update_product/{{ product.id }}" method="POST">
+
+        <fieldset>
+            {% csrf_token %}
+
+            <legend>Edit-Product</legend>
+
+            <div><input type="text" name="name" placeholder="NAME" value="{{ product.product_name }}" required></div>
+            <div><textarea name="description" placeholder="DESCRIPTION" rows="4"
+                    required>{{ product.product_description }}</textarea></div>
+            <div><input type="number" name="price" placeholder="0.00" step="0.01" min="1" required></div>
+            <div><input type="number" name="stock" placeholder="STOCK" min="1" required></div>
+
+            <div>
+                <select name="category">
+                    <option value="{{ product.category.id }}" selected>{{ product.category.category_name }}</option>
+                    {% for category in categories %}
+                        {% if category.id != product.category.id %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div><input type="file" name="image" placeholder="SELECT-IMAGE" accept=".jpg , .jpeg , .png"></div>
+            
+            <div><button type="submit">Update Product</button></div>
+
+        </fieldset>
+
+    </form>
+
+</body>
+
+</html>
