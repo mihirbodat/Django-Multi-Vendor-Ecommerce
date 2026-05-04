@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+
+<body>
+    <section>
+        {% for product in products %}
+        <div>
+            <a href="{% url 'product_detail' product.id %}">
+                <img src="{{ product.product_image.url }}">
+                <p>{{ product.product_name }}</p>
+                <p>{{ product.product_price }}</p>
+            </a>
+            <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+        </div>
+        {% endfor %}
+    </section>
+</body>
+
+</html>

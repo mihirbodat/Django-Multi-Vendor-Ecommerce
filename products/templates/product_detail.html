@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.product_name }}</title>
+</head>
+<body>
+    <div>
+        <img src="{{ product.product_image.url }}">
+        <h2>Product name:{{ product.product_name }}</h2>
+        <h3>Price:{{ product.product_price }}</h3>
+        <p>description:{{ product.product_description }}</p>
+        <p>Stock:{{ product.product_stock }}</p>
+        <p>Fulfilled by {{ product.seller }}</p>
+        <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+        <a href="{%  %}">Buy Now at {{ product.product_price }}</a>
+    </div>
+</body>
+</html>

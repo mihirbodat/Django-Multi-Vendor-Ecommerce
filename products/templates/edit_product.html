@@ -9,7 +9,7 @@
 
 <body>
 
-    <form action="/update_product/{{ product.id }}" method="POST">
+    <form action="{% url 'update_product' product.id %}" method="POST">
 
         <fieldset>
             {% csrf_token %}

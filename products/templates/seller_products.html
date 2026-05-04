@@ -9,7 +9,7 @@
 
 <body>
 
-    <form action="search_product" method="GET">
+    <form action="{% url 'search_product' %}" method="GET">
         {% csrf_token %}
         <input type="search" name="product_name" placeholder="Search Product">
         <input type="submit">
@@ -28,15 +28,18 @@
                 <td>{{ product.product_name }}</td>
                 <td>{{ product.product_stock }}</td>
                 <td>
-                    <a href="edit_product/{{ product.id }}">Edit</a>
+                    <a href="{% url 'edit_product' product.id %}">Edit</a>
                 </td>
                 <td>
-                    <a href="delete_product/{{ product.id }}">Delete</a>
+                    <a href="{% url 'delete_product' product.id %}">Delete</a>
                 </td>
             </tr>
         {% endfor %}
 
     </table>
+    <div>
+        <a href="{% url 'add_product' %}">+ Add Product</a>
+    </div>
 </body>
 
 </html>
