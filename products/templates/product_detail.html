@@ -9,12 +9,12 @@
     <div>
         <img src="{{ product.product_image.url }}">
         <h2>Product name:{{ product.product_name }}</h2>
-        <h3>Price:{{ product.product_price }}</h3>
+        <h3>Price:₹{{ product.product_price }}</h3>
         <p>description:{{ product.product_description }}</p>
         <p>Stock:{{ product.product_stock }}</p>
         <p>Fulfilled by {{ product.seller }}</p>
         <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
-        <a href="{%  %}">Buy Now at {{ product.product_price }}</a>
+        <a href="{% url 'add_to_cart' product.id %}?next=buy_now">Buy Now at {{ product.product_price }}</a>
     </div>
 </body>
 </html>

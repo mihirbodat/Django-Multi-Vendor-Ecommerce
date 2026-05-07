@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+</head>
+
+<body>
+    <section>
+        {% if cart_items %}
+        {% for item in cart_items %}
+        <div>
+            <a href="{% url 'product_detail' item.product.id %}">
+                <img src="{{ item.product.product_image.url }}">
+            </a>
+            <a href="{% url 'product_detail' item.product.id %}">
+                <p>{{ item.product.product_name }}</p>
+            </a>
+            <p>Per Item :₹{{ item.product.product_price }}</p>
+            <p>Subtotal:₹{{ item.subtotal }}</p>
+            <div class="Quantity">
+                <button onclick="updateQuantity(this,'increase','cart')"
+                    itemId="{{ item.id }}"
+                    itemStock="{{ item.product.product_stock }}"
+                    itemQuantity="{{ item.quantity }}">+
+                </button>
+                <p>{{ item.quantity }}</p>
+                <button onclick="updateQuantity(this,'decrease' , 'cart')"
+                    itemId="{{ item.id }}">-
+                </button>
+            </div>
+            <a href="{% url 'remove_item' item.id %}?next=cart">🗑️ Remove</a>
+            <a href="{% url 'buy_now' item.id %}">⚡Buy this now</a>
+        </div>
+        {% endfor %}
+
+        <h3>Total:₹{{ total }}</h3>
+        <a href="{% url 'checkout' %}">Checkout</a>
+
+        {% else %}
+        <p>Your cart is empty!</p>
+        <a href="{% url 'home' %}">Shop now</a>
+        {% endif %}
+    </section>
+
+    <script>
+        function updateQuantity(btn, action , next='cart') {                  // btn =  <button itemId="5">+</button>
+            const itemId = btn.getAttribute('itemId');
+            const stock = parseInt(btn.getAttribute('itemStock'));
+            const quantity = parseInt(btn.getAttribute('itemQuantity'));
+
+            if (action == 'increase' && quantity >= stock) {
+                alert('Stock limit reached!')
+                return;
+            }
+
+            window.location.href = `/update_quantity/${itemId}/${action}/?next=${next}`;
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width , initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+
+<body>
+    <section>
+        
+        {% for item in cart_items %}
+            <img src="{{ item.product.product_image.url }}" alt="">
+            <p>{{ item.product.product_name }}</p>
+            <p>Subtotal:₹{{ item.subtotal }}</p>
+            <div id="quantity">
+                <button onclick="updateQuantity(this , 'increase','checkout')"
+                    itemId="{{ item.id }}"
+                    itemStock="{{ item.product.product_stock }}"
+                    itemQuantity="{{ item.quantity }}" >+
+                </button>
+                <p>{{ item.quantity }}</p>
+                <button onclick="updateQuantity(this , 'decrease','checkout')"
+                    itemId="{{ item.id }}" >-
+                </button>
+            </div>
+            <a href="{% url 'remove_item' item.id %}?next=checkout">Remove</a>
+        {% endfor %}
+
+        <h3>Total:₹{{ total }}</h3>
+        <form action="{% url 'place_order' %}" method="POST">
+            {% csrf_token %}
+            {% for item in cart_items %}
+                <input type="hidden" name="item_ids" value="{{ item.id }}">
+            {% endfor %}
+            <input type="hidden" name="total" value="{{ total }}">
+            <button type="submit">Place Order</button>
+        </form>
+
+    </section>
+
+    <script>
+        function updateQuantity(btn , action , next='checkout') {
+            const itemId = btn.getAttribute('item.id');
+            const stock = parseInt(btn.getAttribute('itemStock'));
+            const quantity = parseInt(btn.getAttribute('itemQuantity'));
+
+            if(action == 'increase' && quantity>=stock){
+                alert('Stock limit reached!')
+                return;
+            }
+            window.location.href = `/update_quantity/${itemId}/${action}/?next=${next}`
+        }
+    </script>
+
+</body>
+
+</html>
