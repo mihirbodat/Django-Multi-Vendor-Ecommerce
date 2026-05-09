@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+</head>
+<body>
+    <section>
+        {% if orders %}
+            {% for order in orders %}
+                <p>Order ID:#{{ order.id }}</p>
+                <p>Date:{{ order.created_at }}</p>
+                
+                {% for item in order.items %}
+                    <a href="{% url 'product_detail' item.product.id %}">
+                        <p>{{ item.product.product_name }}</p>
+                        <img src="{{ item.product.product_image }}">
+                    </a>
+                    <p>Status:{{ item.status }}</p>
+                {% endfor %}
+
+                <p>Total price:₹{{ order.total_price }}</p>
+
+            {% endfor %}
+        {% else %}
+            <p>You haven't ordered anything yet.</p>
+        {% endif %}
+    </section>
+</body>
+</html>

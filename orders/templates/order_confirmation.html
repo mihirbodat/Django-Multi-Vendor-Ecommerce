@@ -15,10 +15,11 @@
             <p>{{ item.product.product_name }}</p>
             <p>Quantity: {{ item.quantity }}</p>
             <p>Price: ₹{{ item.price }}</p>
+            <p>Status: {{ item.status }}</p>
         {% endfor %}
 
         <a href="{% url 'home' %}">Continue Shopping</a>
-        <a href="{% url 'orders' %}">My Orders</a>
+        <a href="{% url 'my_orders' %}">My Orders</a>
     </section>
 </body>
 </html>

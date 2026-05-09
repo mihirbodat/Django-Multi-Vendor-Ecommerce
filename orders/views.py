@@ -11,6 +11,16 @@ def buyer_check(request):
     
     return None
 
+def seller_check(request):
+    if not request.user.is_authenticated:
+        return redirect('loginuser') 
+    if not hasattr(request.user , 'sellerprofile'):
+        return redirect('loginuser')
+    if not request.user.sellerprofile.is_approved:
+        messages.error(request , 'Admin approval pending!')
+        return redirect('seller_dashboard')
+    return None
+
 def add_to_cart(request , id):
     check = buyer_check(request)
     if check:
@@ -152,9 +162,38 @@ def order_confirmation(request , id):
     return render(request, 'order_confirmation.html' , {'order':order , 
                                                         'order_items':order_items})
 
-def orders(request):
+def my_orders(request):
     check = buyer_check(request)
     if check:
         return check
     
-    orders =  
+    orders = Order.objects.filter(user = request.user)
+    
+    for order in orders:
+        order.items = OrderItem.objects.filter(order=order)
+
+    return render(request , 'my_orders.html' , {'orders':orders})
+
+
+def seller_orders(request):
+    check = seller_check(request)
+    if check:
+        return check
+
+    order_items = OrderItem.objects.filter(seller=request.user.sellerprofile)
+
+    for item in order_items:
+        item.subtotal = item.price*item.quantity
+
+    return render(request , 'seller_orders.html' , {'order_items':order_items})
+
+def update_status(request , id):
+    check = seller_check(request)
+    if check:
+        return check
+    
+    order_item = OrderItem.objects.get(id=id)
+
+    order_item.status = request.POST['status']
+    order_item.save()
+    return redirect('seller_orders')
