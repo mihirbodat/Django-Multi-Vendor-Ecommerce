@@ -1,39 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Orders</title>
+    <title>Manage-Orders</title>
 </head>
+
 <body>
     <section>
-        {% for item in order_items %}
-            <p>Order ID: #{{ item.order.id }}</p>
-            <p>Buyer:{{ item.order.user.username }}</p>
-            <p>Product:{{ item.product.product_name }}</p>
-            <p>Quantity:{{ item.quantity }}</p>
-            <p>Price:₹{{ item.price }} x {{ item.quantity }} = ₹{{ item.subtotal }}</p>
-            <p>Status:{{ item.status }}</p>
-            
-            <form action="{% url 'update_status' item.id %}" method="POST">
-                {% csrf_token %}
 
-                <select name="status">
-                    <option value="Pending" {% if item.status == 'Pending' %}selected{% endif %}>
-                        Pending</option>
-                    <option value="Confirmed" {% if item.status == 'Confirmed' %}selected{% endif %}>
-                        Confirmed</option>
-                    <option value="Shipped" {% if item.status == 'Shipped' %}selected{% endif %}>
-                        Shipped</option>
-                    <option value="Delivered" {% if item.status == 'Delivered' %}selected{% endif %}>
-                        Delivered</option>
-                    <option value="Cancelled" {% if item.status == 'Cancelled' %}selected{% endif %}>
-                        Cancelled</option>
-                </select>
-                <button type="submit">Update</button>
-            </form>
+        <table border="1" style="border-spacing: 10px 15px;">
+            <tr>
+                <th>Order ID</th>
+                <th>Buyer</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Current-Status</th>
+                <th>Update-status</th>
+            </tr>
 
-        {% endfor %}
+            {% for item in order_items %}
+            <tr>
+                <td>#{{ item.order.id }}</td>
+                <td>{{ item.order.user.username }}</td>
+                <td>{{ item.product.product_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }} x {{ item.quantity }} = ₹{{ item.subtotal }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                    <form action="{% url 'update_status' item.id %}" method="POST">
+                        {% csrf_token %}
+
+                        <select name="status">
+                            <option value="Pending" {% if item.status=='Pending' %}selected{% endif %}>
+                                Pending</option>
+                            <option value="Confirmed" {% if item.status=='Confirmed' %}selected{% endif %}>
+                                Confirmed</option>
+                            <option value="Shipped" {% if item.status=='Shipped' %}selected{% endif %}>
+                                Shipped</option>
+                            <option value="Delivered" {% if item.status=='Delivered' %}selected{% endif %}>
+                                Delivered</option>
+                            <option value="Cancelled" {% if item.status=='Cancelled' %}selected{% endif %}>
+                                Cancelled</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+  
     </section>
 </body>
+
 </html>
