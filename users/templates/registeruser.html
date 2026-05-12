@@ -24,7 +24,12 @@
 
             <div><input type="email" name="email" placeholder="E-MAIL" required autocomplete="off"></div>
 
-            <div><input type="password" name="password" placeholder="PASSWORD" required autocomplete="new-password"></div>
+            <div>
+                <input type="password" id="password1" name="password1" placeholder="PASSWORD" required autocomplete="new-password">
+                <button type="button" id="eyebtn" onclick="togglePassword()">👁/</button>
+            </div>
+            
+            <div><input type="password" id="password2" name="password2" placeholder="CONFIRM-PASSWORD" required autocomplete="off"></div>
 
             <div>
                 <select name="role" required>
@@ -40,6 +45,9 @@
 
             <div><button type="submit">Register</button></div>
         </fieldset>
+
+        <div><h3>Existing User? <a href="{% url 'loginuser' %}">LOG-IN</a></h3></div>
+
     </form>
 
     <script>
@@ -53,6 +61,20 @@
                 shopDiv.style.display = 'none'
             }
         })
+
+        function togglePassword() {
+            const input = document.getElementById('password1');
+            const eyebtn = document.getElementById('eyebtn');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyebtn.textContent = '👁';
+            }else {
+                input.type = 'password';
+                eyebtn.textContent = '👁/';
+            }
+
+        }
     </script>
 </body>
 

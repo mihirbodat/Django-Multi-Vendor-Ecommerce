@@ -9,11 +9,17 @@
 
 <body>
 
-    <form action="{% url 'search_product' %}" method="GET">
+    <form action="{% url 'seller_search_product' %}" method="GET">
         {% csrf_token %}
         <input type="search" name="product_name" placeholder="Search Product">
         <input type="submit">
     </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="error-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
     <table border="1" style="border-spacing: 10px 15px;">
         <tr>
@@ -23,6 +29,7 @@
             <th>Delete-Product</th>
         </tr>
 
+        {% if products %}
         {% for product in products %}
             <tr>
                 <td>{{ product.product_name }}</td>
@@ -35,6 +42,9 @@
                 </td>
             </tr>
         {% endfor %}
+        {% else %}
+            <tr>You haven't added any products yet!</tr>
+        {% endif %}
 
     </table>
     <div>

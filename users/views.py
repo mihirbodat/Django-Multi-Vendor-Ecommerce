@@ -12,10 +12,14 @@ def home(request):
     return render(request , 'home.html')
 
 def registeruser(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method == "POST":
         username = request.POST['username']
         email = request.POST['email']
-        password = request.POST['password']
+        password = request.POST['password1']
+        confirm_password = request.POST['password2']
         role = request.POST['role']
 
         if User.objects.filter(username = username).exists():
@@ -24,6 +28,10 @@ def registeruser(request):
         
         if User.objects.filter(email=email).exists():
             messages.error(request , 'Email already registered!')
+            return render(request , 'registeruser.html')
+        
+        if password != confirm_password :
+            messages.error(request , 'Passwords do not match!')
             return render(request , 'registeruser.html')
         
         user = User.objects.create_user(username=username, email=email, password=password)
@@ -36,6 +44,9 @@ def registeruser(request):
 
 
 def loginuser(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']

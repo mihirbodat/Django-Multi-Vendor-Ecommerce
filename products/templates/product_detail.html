@@ -13,8 +13,14 @@
         <p>description:{{ product.product_description }}</p>
         <p>Stock:{{ product.product_stock }}</p>
         <p>Fulfilled by {{ product.seller }}</p>
-        <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
-        <a href="{% url 'add_to_cart' product.id %}?next=buy_now">Buy Now at {{ product.product_price }}</a>
+        {% if product.product_stock == 0 %}
+            <p>Currently out of stock!</p>
+        {% else %}
+            <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+            <a href="{% url 'add_to_cart' product.id %}?next=buy_now">
+                Buy Now at {{ product.product_price }}
+            </a>
+        {% endif %}
     </div>
 </body>
 </html>

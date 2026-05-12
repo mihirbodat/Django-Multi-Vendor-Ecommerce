@@ -1,6 +1,7 @@
 from django.shortcuts import render , redirect
 from django.contrib import messages
 from .models import *
+from  django.core.paginator import Paginator
 
 def seller_check(request):
     if not request.user.is_authenticated:
@@ -78,14 +79,14 @@ def update_product(request , id):
     return redirect('seller_products')
 
 
-def search_product(request):
+def seller_search_product(request):
     check = seller_check(request)
     if check:
         return check
 
-    name = request.GET.get('product_name' , '')
-    if name:
-        products = Product.objects.filter(product_name__icontains=name)
+    search = request.GET.get('product_name' , '')
+    if search:
+        products = Product.objects.filter(product_name__icontains=search)
     else:
         products = Product.objects.filter(seller = request.user.sellerprofile)
     return render(request , 'seller_products.html' , {'products':products})
@@ -97,17 +98,45 @@ def delete_product(request , id):
         return check
 
     product = Product.objects.get(id=id)
+
+    if product.seller != request.user.sellerprofile:
+        messages.error(request , 'This is not your product.')
+        return redirect('seller_products')
+
     product.delete()
     return redirect('seller_products')
 
 
 def buyer_products(request):
     products = Product.objects.all()
-    return render(request , 'buyer_products.html' , {'products':products})
+
+    paginator = Paginator(products,10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request , 'buyer_products.html' , {'page_obj':page_obj})
 
 
 def product_detail(request , id):
     product = Product.objects.get(id=id)
     return render(request , 'product_detail.html' , {'product':product})
  
-        
+
+def buyer_search_product(request):
+    
+    search = request.GET.get('product_name', '')
+
+    if search:
+        products = Product.objects.filter(
+                product_name__icontains = search    
+            ) | Product.objects.filter(                     # | = merge both results
+                category__category_name__icontains = search
+            ).distinct()                              # .distinct() = remove duplicates from result
+    else:
+        products = Product.objects.all()
+
+        paginator = Paginator(products , 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request , 'buyer_products.html' , {'page_obj':page_obj , 'search':search})   

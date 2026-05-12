@@ -9,16 +9,53 @@
 
 <body>
     <section>
-        {% for product in products %}
+
+        <form action="{% url 'buyer_search_product' %}" method="GET">
+            <input type="search" name="product_name" value="{{ search }}" placeholder="Search Product">
+            <button type="submit">Search</button>
+        </form>
+
+        {% for product in page_obj %}
         <div>
             <a href="{% url 'product_detail' product.id %}">
                 <img src="{{ product.product_image.url }}">
                 <p>{{ product.product_name }}</p>
                 <p>₹{{ product.product_price }}</p>
             </a>
-            <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+            {% if product.product_stock == 0 %}
+                <p>Currently out of stock!</p>
+            {% else %}
+                <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+            {% endif %}
         </div>
         {% endfor %}
+
+        {% if search %}
+
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&product_name={{ search }}">Previous</a>
+            {% endif %}
+
+            <span>Page:{{ page_obj.number }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&product_name={{ search }}"></a>
+            {% endif %}
+
+        {% else %}
+
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            <span>Page:{{ page_obj.number }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+
+        {% endif %}
+
     </section>
 </body>
 

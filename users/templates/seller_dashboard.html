@@ -19,6 +19,13 @@
             </li>
         </ul>
     </nav>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="error-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
     <main>
         <a href="{% url 'add_product' %}">+ Add Product</a>
         <a href="{% url 'seller_products' %}">Manage Products</a>
