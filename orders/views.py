@@ -157,7 +157,11 @@ def order_confirmation(request , id):
     if check:
         return check
     
-    order = Order.objects.get(id=id)
+    try:
+        order = Order.objects.get(id=id , user = request.user)
+    except Order.DoesNotExist:
+        return redirect('buyer_products')
+
     order_items = OrderItem.objects.filter(order=order)
     return render(request, 'order_confirmation.html' , {'order':order , 
                                                         'order_items':order_items})

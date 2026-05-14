@@ -11,8 +11,29 @@
     <section>
 
         <form action="{% url 'buyer_search_product' %}" method="GET">
-            <input type="search" name="product_name" value="{{ search }}" placeholder="Search Product">
-            <button type="submit">Search</button>
+            <div class="search">
+                <input type="search" name="product_name" value="{{ search }}" placeholder="Search Product">
+                <button type="submit">Search</button>
+            </div>
+            <div class="filter">
+
+                <select name="category">
+                    <option value="" {% if not category_id %} selected {% endif %}>
+                            -- Select Category --
+                    </option>
+                    {% if category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_id %}
+                            selected {% endif %}>{{ category.category_name }}
+                    </option>
+                    {% endif %}
+                </select>
+                <div name="price_range">
+                    <input type="number" name="min-price" placeholder="Min Price" value="{{ min_price }}">
+                    <span>to</span>
+                    <input type="number" name="max-price" placeholder="Max Price" value="{{ max_price }}">
+                </div>
+                
+            </div>
         </form>
 
         {% for product in page_obj %}
@@ -30,30 +51,20 @@
         </div>
         {% endfor %}
 
-        {% if search %}
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&product_name={{ search }}
+                &category={{ category_id }}&min-price={{ min_price }}&max-price={{ max_price }}">
+                Previous
+            </a>
+        {% endif %}
 
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}&product_name={{ search }}">Previous</a>
-            {% endif %}
+        <span>Page:{{ page_obj.number }}</span>
 
-            <span>Page:{{ page_obj.number }}</span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}&product_name={{ search }}"></a>
-            {% endif %}
-
-        {% else %}
-
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            {% endif %}
-
-            <span>Page:{{ page_obj.number }}</span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
-            {% endif %}
-
+        {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&product_name={{ search }}
+                    &category={{ category_id }}&min-price={{ min_price }}&max-price={{ max_price }}">
+                    Next
+                </a>
         {% endif %}
 
     </section>

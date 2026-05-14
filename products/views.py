@@ -125,6 +125,9 @@ def product_detail(request , id):
 def buyer_search_product(request):
     
     search = request.GET.get('product_name', '')
+    category_id = request.GET.get('category' , '')
+    min_price = request.GET.get('min-price' , '')
+    max_price = request.GET.get('max-price' , '')
 
     if search:
         products = Product.objects.filter(
@@ -135,8 +138,22 @@ def buyer_search_product(request):
     else:
         products = Product.objects.all()
 
-        paginator = Paginator(products , 10)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+    if category_id:
+        products = products.filter(category__id=category_id)
 
-        return render(request , 'buyer_products.html' , {'page_obj':page_obj , 'search':search})   
+    if min_price:
+        products = products.filter(product_price__gte=min_price)
+
+    if max_price:
+        products = products.filter(product_price__lte=max_price)
+
+    paginator = Paginator(products , 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    categories = Category.objects.all()
+
+    return render(request , 'buyer_products.html' ,
+                {'page_obj':page_obj , 'search':search ,
+                 'categories':categories , 'category_id':category_id,
+                 'min_price':min_price , 'max_price':max_price})   
