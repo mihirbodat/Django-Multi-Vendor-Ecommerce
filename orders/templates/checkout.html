@@ -14,13 +14,13 @@
             <p>{{ item.product.product_name }}</p>
             <p>Subtotal:₹{{ item.subtotal }}</p>
             <div id="quantity">
-                <button onclick="updateQuantity(this , 'increase','checkout')"
+                <button onclick="updateQuantity(this , 'increase')"
                     itemId="{{ item.id }}"
                     itemStock="{{ item.product.product_stock }}"
                     itemQuantity="{{ item.quantity }}" >+
                 </button>
                 <p>{{ item.quantity }}</p>
-                <button onclick="updateQuantity(this , 'decrease','checkout')"
+                <button onclick="updateQuantity(this , 'decrease')"
                     itemId="{{ item.id }}" >-
                 </button>
             </div>
@@ -40,16 +40,22 @@
     </section>
 
     <script>
-        function updateQuantity(btn , action , next='checkout') {
-            const itemId = btn.getAttribute('item.id');
+        function updateQuantity(btn , action) {
+            const itemId = btn.getAttribute('itemId');
             const stock = parseInt(btn.getAttribute('itemStock'));
             const quantity = parseInt(btn.getAttribute('itemQuantity'));
+            const buyNowId = "{{ buy_now_item_id }}";
 
             if(action == 'increase' && quantity>=stock){
                 alert('Stock limit reached!')
                 return;
             }
-            window.location.href = `/update_quantity/${itemId}/${action}/?next=${next}`
+            
+            if (buyNowId) {
+                window.location.href = `/orders/update_quantity/${itemId}/${action}/?next=buy_now`;
+            }else {
+                window.location.href = `/orders/update_quantity/${itemId}/${action}/?next=checkout`;
+            }
         }
     </script>
 

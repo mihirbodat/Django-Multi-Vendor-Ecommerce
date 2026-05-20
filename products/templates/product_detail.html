@@ -6,6 +6,11 @@
     <title>{{ product.product_name }}</title>
 </head>
 <body>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
     <div>
         <img src="{{ product.product_image.url }}">
         <h2>Product name:{{ product.product_name }}</h2>

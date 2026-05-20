@@ -16,7 +16,7 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="error-box">{{ message }}</div>
+                    <div class="message-box">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
@@ -40,7 +40,7 @@
             </div>
 
             <div id="shop_name_div" style="display: none">
-                <input type="text" name="shop_name" placeholder="SHOP NAME">
+                <input type="text" id="shop_name_input" name="shop_name" placeholder="SHOP NAME">
             </div>
 
             <div><button type="submit">Register</button></div>
@@ -51,16 +51,20 @@
     </form>
 
     <script>
-        const role = document.getElementsByName('role')[0]
-        const shopDiv = document.getElementById('shop_name_div')
+        const role = document.getElementsByName('role')[0];
+        const shopDiv = document.getElementById('shop_name_div');
+        const shopInput = document.getElementById('shop_name_input');
 
         role.addEventListener('change', function () {
             if (this.value === 'seller') {
-                shopDiv.style.display = 'block'
+                shopDiv.style.display = 'block';
+                shopInput.required = true;
             } else {
-                shopDiv.style.display = 'none'
+                shopDiv.style.display = 'none';
+                shopInput.required = false;
+                shopInput.value = "";
             }
-        })
+        });
 
         function togglePassword() {
             const input = document.getElementById('password1');

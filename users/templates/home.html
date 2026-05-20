@@ -1,26 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Shopping</title>
 </head>
+
 <body>
     <nav>
         <ul>
+            <form action="{% url 'buyer_search_product' %}" method="GET">
+                <div class="search">
+                    <input type="search" name="product_name" value="{{ search }}" placeholder="Search Product">
+                    <button type="submit">Search</button>
+                </div>
+                <div class="filter">
+
+                    <select name="category">
+                        <option value="" {% if not category_id %} selected {% endif %}>
+                            -- Select Category --
+                        </option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id|stringformat:"s" == category_id %} selected
+                            {% endif %}>{{ category.category_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div name="price_range">
+                        <input type="number" name="min-price" placeholder="Min Price" value="{{ min_price }}" min="1">
+                        <span>to</span>
+                        <input type="number" name="max-price" placeholder="Max Price" value="{{ max_price }}" min="1">
+                    </div>
+
+                </div>
+            </form>
+
             {% if request.user.is_authenticated %}
-                <li><a href="{% url 'logoutuser' %}">LOGOUT</a></li>
+            <li><a href="{% url 'logoutuser' %}">LOGOUT</a></li>
+            <li><a href="{% url 'cart' %}">🛒Cart</a></li>
+            <li><a href="{% url 'my_orders' %}">Orders</a></li>
             {% else %}
-                <li><a href="{% url 'registeruser' %}">SIGN-UP</a></li>
-                <li><a href="{% url 'loginuser' %}">LOGIN</a></li>
-            {% endif %}   
+            <li><a href="{% url 'registeruser' %}">SIGN-UP</a></li>
+            <li><a href="{% url 'loginuser' %}">LOGIN</a></li>
+            {% endif %}
         </ul>
     </nav>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
     <main>
-        {% include 'buyer_products.html' %}
+
+        {% for product in page_obj %}
+        <div>
+            <a href="{% url 'product_detail' product.id %}">
+                <img src="{{ product.product_image.url }}">
+                <p>{{ product.product_name }}</p>
+                <p>₹{{ product.product_price }}</p>
+            </a>
+            {% if product.product_stock == 0 %}
+            <p>Currently out of stock!</p>
+            {% else %}
+            <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&product_name={{ search }}
+                &category={{ category_id }}&min-price={{ min_price }}&max-price={{ max_price }}">
+            Previous
+        </a>
+        {% endif %}
+
+        <span>Page:{{ page_obj.number }}</span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&product_name={{ search }}
+                    &category={{ category_id }}&min-price={{ min_price }}&max-price={{ max_price }}">
+            Next
+        </a>
+        {% endif %}
+
     </main>
+
     <footer>
         <h3>&#169; All Right Reserved</h3>
     </footer>
 </body>
+
 </html>

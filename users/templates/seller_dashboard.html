@@ -17,12 +17,15 @@
             <li>Revenue
                 <p>{{ revenue }}</p>
             </li>
+            <li>
+                <a href="{% url 'logoutuser' %}">LOGOUT</a>
+            </li>
         </ul>
     </nav>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="error-box">{{ message }}</div>
+            <div class="message-box">{{ message }}</div>
         {% endfor %}
     {% endif %}
 

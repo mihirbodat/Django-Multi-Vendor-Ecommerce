@@ -5,11 +5,22 @@ from orders.models import *
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login , logout
+from  django.core.paginator import Paginator
 
 # Create your views here.
 
 def home(request):
-    return render(request , 'home.html')
+    products = Product.objects.all()
+
+    paginator = Paginator(products,10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    categories = Category.objects.all()
+
+    return render(request , 'home.html' , {
+                            'page_obj':page_obj , 
+                            'categories':categories})
 
 def registeruser(request):
     if request.user.is_authenticated:
@@ -71,7 +82,7 @@ def loginuser(request):
 
 def logoutuser(request):
     logout(request)
-    return redirect('loginuser')
+    return redirect('home')
 
 def seller_dashboard(request):
     if not request.user.is_authenticated:
@@ -83,7 +94,7 @@ def seller_dashboard(request):
 
     total_products = Product.objects.filter(seller=seller).count()
     total_orders = OrderItem.objects.filter(seller=seller).count()
-    revenue = sum(item.price*item.quantity for item in OrderItem.objects.filter(seller=seller))
+    revenue = sum(item.price*item.quantity for item in OrderItem.objects.filter(seller=seller , status='Delivered'))
     recent_orders = OrderItem.objects.filter(seller=seller).order_by('-id')[:5]
 
     for item in recent_orders:
@@ -94,3 +105,45 @@ def seller_dashboard(request):
                     'total_orders':total_orders,
                     'revenue':revenue,
                     'recent_orders':recent_orders})
+
+
+def buyer_search_product(request):
+    
+    search = request.GET.get('product_name', '')
+    category_id = request.GET.get('category' , '')
+    min_price = request.GET.get('min-price' , '')
+    max_price = request.GET.get('max-price' , '')
+
+    if search:
+        products = (Product.objects.filter(
+                product_name__icontains = search    
+            ) | Product.objects.filter(                     # | = merge both results
+                category__category_name__icontains = search
+            )).distinct()                              # .distinct() = remove duplicates from result
+    else:
+        products = Product.objects.all()
+
+    if category_id:
+        products = products.filter(category__id=category_id)
+
+    if min_price and max_price:
+        if int(min_price) > int(max_price):
+            messages.error(request , 'Min price cannot be greater than max price!')
+            return redirect('home')
+
+    if min_price:
+        products = products.filter(product_price__gte=min_price)
+
+    if max_price:
+        products = products.filter(product_price__lte=max_price)
+
+    paginator = Paginator(products , 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    categories = Category.objects.all()
+
+    return render(request , 'home.html' ,
+                {'page_obj':page_obj , 'search':search ,
+                 'categories':categories , 'category_id':category_id,
+                 'min_price':min_price , 'max_price':max_price})

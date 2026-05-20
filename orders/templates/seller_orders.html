@@ -35,15 +35,15 @@
                         {% csrf_token %}
 
                         <select name="status">
-                            <option value="Pending" {% if item.status=='Pending' %}selected{% endif %}>
+                            <option value="Pending" {% if item.status == 'Pending' %}selected{% endif %}>
                                 Pending</option>
-                            <option value="Confirmed" {% if item.status=='Confirmed' %}selected{% endif %}>
+                            <option value="Confirmed" {% if item.status == 'Confirmed' %}selected{% endif %}>
                                 Confirmed</option>
-                            <option value="Shipped" {% if item.status=='Shipped' %}selected{% endif %}>
+                            <option value="Shipped" {% if item.status == 'Shipped' %}selected{% endif %}>
                                 Shipped</option>
-                            <option value="Delivered" {% if item.status=='Delivered' %}selected{% endif %}>
+                            <option value="Delivered" {% if item.status == 'Delivered' %}selected{% endif %}>
                                 Delivered</option>
-                            <option value="Cancelled" {% if item.status=='Cancelled' %}selected{% endif %}>
+                            <option value="Cancelled" {% if item.status == 'Cancelled' %}selected{% endif %}>
                                 Cancelled</option>
                         </select>
                         <button type="submit">Update</button>
@@ -52,7 +52,7 @@
             </tr>
             {% endfor %}
             {% else %}
-                <tr>No one has placed an order yet!</tr>
+                <tr><td colspan="7" style="text-align: center;">No one has placed an order yet!</td></tr>
             {% endif %}
         </table>
   

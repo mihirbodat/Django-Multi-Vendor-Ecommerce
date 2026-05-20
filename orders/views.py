@@ -26,7 +26,11 @@ def add_to_cart(request , id):
     if check:
         return check
     
-    product = Product.objects.get(id=id)
+    try:
+        product = Product.objects.get(id=id)
+    except Product.DoesNotExist:
+        messages.error(request , 'Product does not exist!')
+        return redirect('home')
     
     cart , created = Cart.objects.get_or_create(user=request.user)
 
@@ -41,7 +45,8 @@ def add_to_cart(request , id):
     if next == 'buy_now':
         return redirect('buy_now' , id=cart_item.id)
     
-    return redirect('cart')
+    messages.success(request , 'Item added to cart!')
+    return redirect(request.META.get('HTTP_REFERER' ,'home'))
     
 
 def cart(request):
@@ -79,7 +84,10 @@ def update_quantity(request , id , action):
             cart_item.delete()                  # if quantity 1 it becomes 0 ,it means delete cart_item.
     
     next = request.GET.get('next')   
-    return redirect(next)
+    if next == 'buy_now':
+        return redirect('buy_now' , id=id)
+    else :
+        return redirect(next)
 
 
 def remove_item(request , id):
@@ -126,7 +134,10 @@ def buy_now(request , id):
 
     cart_item.subtotal = cart_item.product.product_price*cart_item.quantity
 
-    return render(request , 'checkout.html' , {'cart_items':[cart_item] , 'total':cart_item.subtotal})
+    return render(request , 'checkout.html' , {
+                            'cart_items':[cart_item] ,
+                            'total':cart_item.subtotal ,
+                            'buy_now_item_id':id})
 
 
 def place_order(request):
@@ -160,7 +171,7 @@ def order_confirmation(request , id):
     try:
         order = Order.objects.get(id=id , user = request.user)
     except Order.DoesNotExist:
-        return redirect('buyer_products')
+        return redirect('home')
 
     order_items = OrderItem.objects.filter(order=order)
     return render(request, 'order_confirmation.html' , {'order':order , 

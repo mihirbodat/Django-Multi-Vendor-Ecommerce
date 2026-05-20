@@ -1,7 +1,6 @@
 from django.shortcuts import render , redirect
 from django.contrib import messages
 from .models import *
-from  django.core.paginator import Paginator
 
 def seller_check(request):
     if not request.user.is_authenticated:
@@ -55,8 +54,13 @@ def edit_product(request , id):
         return check
     
     product = Product.objects.get(id=id)
+
+    if product.seller != request.user.sellerprofile:
+        messages.error(request , 'This is not your product.')
+        return redirect('seller_products')
+
     categories = Category.objects.all()
-    return render(request , 'edit_product' , {'product':product , 'categories' : categories})
+    return render(request , 'edit_product.html' , {'product':product , 'categories' : categories})
 
 
 def update_product(request , id):
@@ -107,53 +111,7 @@ def delete_product(request , id):
     return redirect('seller_products')
 
 
-def buyer_products(request):
-    products = Product.objects.all()
-
-    paginator = Paginator(products,10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request , 'buyer_products.html' , {'page_obj':page_obj})
-
-
 def product_detail(request , id):
     product = Product.objects.get(id=id)
     return render(request , 'product_detail.html' , {'product':product})
- 
-
-def buyer_search_product(request):
     
-    search = request.GET.get('product_name', '')
-    category_id = request.GET.get('category' , '')
-    min_price = request.GET.get('min-price' , '')
-    max_price = request.GET.get('max-price' , '')
-
-    if search:
-        products = Product.objects.filter(
-                product_name__icontains = search    
-            ) | Product.objects.filter(                     # | = merge both results
-                category__category_name__icontains = search
-            ).distinct()                              # .distinct() = remove duplicates from result
-    else:
-        products = Product.objects.all()
-
-    if category_id:
-        products = products.filter(category__id=category_id)
-
-    if min_price:
-        products = products.filter(product_price__gte=min_price)
-
-    if max_price:
-        products = products.filter(product_price__lte=max_price)
-
-    paginator = Paginator(products , 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    categories = Category.objects.all()
-
-    return render(request , 'buyer_products.html' ,
-                {'page_obj':page_obj , 'search':search ,
-                 'categories':categories , 'category_id':category_id,
-                 'min_price':min_price , 'max_price':max_price})   

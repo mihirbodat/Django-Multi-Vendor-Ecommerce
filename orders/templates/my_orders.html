@@ -15,7 +15,7 @@
                 {% for item in order.items %}
                     <a href="{% url 'product_detail' item.product.id %}">
                         <p>{{ item.product.product_name }}</p>
-                        <img src="{{ item.product.product_image }}">
+                        <img src="{{ item.product.product_image.url }}">
                     </a>
                     <p>Status:{{ item.status }}</p>
                 {% endfor %}

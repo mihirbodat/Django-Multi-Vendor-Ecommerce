@@ -17,7 +17,7 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="error-box">{{ message }}</div>
+            <div class="message-box">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
@@ -43,7 +43,7 @@
             </tr>
         {% endfor %}
         {% else %}
-            <tr>You haven't added any products yet!</tr>
+            <tr><td colspan="4" style="text-align: center;">You haven't added any products yet!</td></tr>
         {% endif %}
 
     </table>
