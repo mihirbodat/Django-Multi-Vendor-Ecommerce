@@ -9,6 +9,16 @@ from  django.core.paginator import Paginator
 
 # Create your views here.
 
+def buyer_check(request):
+    if not request.user.is_authenticated:
+        return redirect('loginuser')
+    
+    if hasattr(request.user , 'sellerprofile'):
+        return redirect('seller_dashboard')
+    
+    return None
+
+
 def home(request):
     products = Product.objects.all()
 
@@ -147,3 +157,39 @@ def buyer_search_product(request):
                 {'page_obj':page_obj , 'search':search ,
                  'categories':categories , 'category_id':category_id,
                  'min_price':min_price , 'max_price':max_price})
+
+def review(request , ItemId):
+    check = buyer_check(request)
+    if check:
+        return check
+    
+    try:
+        order_item = OrderItem.objects.get(id=ItemId)
+    except OrderItem.DoesNotExist:
+        messages.error(request , 'Product does not exist!')
+        return redirect('my_orders')
+    
+    if not order_item.status == "Delivered":
+        messages.error(request , 'You can only submit a review after the product has been delivered!')
+        return redirect('my_orders')
+    
+    if Review.objects.filter(buyer = request.user , order_item = order_item).exists() :
+        messages.error(request , 'You have already reviewed this product!')
+        return redirect('my_orders')
+    
+    if request.method == 'POST':
+        rating = request.POST['rating']
+        message = request.POST['description']
+        images = request.FILES.getlist('image',None)
+
+        review = Review.objects.create(buyer=request.user , product=order_item.product,
+                                       order_item=order_item, rating = rating,
+                                       message=message , is_approved = False)
+        
+        if images:
+            for image in images:
+                ReviewImage.objects.create(review=review , image=image)
+        messages.success(request,'Thank you so much. Your review has been saved.')
+        return redirect('my_orders')
+        
+    return render(request , 'review.html' , {'order_item':order_item})

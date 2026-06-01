@@ -11,9 +11,9 @@
             <div class="message-box">{{ message }}</div>
         {% endfor %}
     {% endif %}
-    <div>
-        <img src="{{ product.product_image.url }}">
-        <h2>Product name:{{ product.product_name }}</h2>
+    <div class="product_detail">
+        <img src="{{ product.product_image.url }}" width="800">
+        <h2>{{ product.product_name }}</h2>
         <h3>Price:₹{{ product.product_price }}</h3>
         <p>description:{{ product.product_description }}</p>
         <p>Stock:{{ product.product_stock }}</p>
@@ -27,5 +27,34 @@
             </a>
         {% endif %}
     </div>
+
+    <button onclick="toggleReviews()">Ratings and reviews ▼
+        <p>{{ avg_rating }}⭐ based on {{ total_reviews }} ratings and reviews</p>
+    </button>
+    <div id="rating_review" style="display: none;">
+        {% if reviews %}
+            {% for review in reviews %}
+                <p>{{ review.buyer.username }} - {{ review.rating }}⭐</p>
+                <p>{{ review.message }}</p>
+                {% for image in review.images.all %}
+                    <img src="{{ image.image.url }}" width="100">
+                {% endfor %}  
+            {% endfor %}
+        {% else %}
+        <p>No ratings for this product yet</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleReviews(){
+            const section = document.getElementById('rating_review');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+            }else {
+                section.style.display = 'none'; 
+            }
+        }
+    </script>
+
 </body>
 </html>

@@ -8,6 +8,13 @@
 <body>
     <section>
         {% if orders %}
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message-box">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
             {% for order in orders %}
                 <p>Order ID:#{{ order.id }}</p>
                 <p>Date:{{ order.created_at }}</p>
@@ -15,9 +22,16 @@
                 {% for item in order.items %}
                     <a href="{% url 'product_detail' item.product.id %}">
                         <p>{{ item.product.product_name }}</p>
-                        <img src="{{ item.product.product_image.url }}">
+                        <img src="{{ item.product.product_image.url }}" width="500">
                     </a>
                     <p>Status:{{ item.status }}</p>
+                    {% if item.status == "Delivered" %}
+                        {% if item.already_reviewed %}
+                            <p>✅ Reviewed</p>
+                        {% else %}
+                            <a href="{% url 'review' item.id %}">⭐ Rate & Review Product</a>
+                        {% endif %}
+                    {% endif %}
                 {% endfor %}
 
                 <p>Total price:₹{{ order.total_price }}</p>

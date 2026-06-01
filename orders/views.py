@@ -1,6 +1,7 @@
 from django.shortcuts import render , redirect
 from .models import *
 from django.contrib import messages
+from users.models import *
 
 def buyer_check(request):
     if not request.user.is_authenticated:
@@ -186,6 +187,11 @@ def my_orders(request):
     
     for order in orders:
         order.items = OrderItem.objects.filter(order=order)
+        for item in order.items :
+            item.already_reviewed = Review.objects.filter(
+                buyer = request.user , 
+                order_item = item
+            ).exists()
 
     return render(request , 'my_orders.html' , {'orders':orders})
 

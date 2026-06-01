@@ -58,7 +58,7 @@
         {% for product in page_obj %}
         <div>
             <a href="{% url 'product_detail' product.id %}">
-                <img src="{{ product.product_image.url }}">
+                <img src="{{ product.product_image.url }}" width="500">
                 <p>{{ product.product_name }}</p>
                 <p>₹{{ product.product_price }}</p>
             </a>

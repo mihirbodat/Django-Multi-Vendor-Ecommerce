@@ -1,6 +1,7 @@
 from django.shortcuts import render , redirect
 from django.contrib import messages
 from .models import *
+from users.models import *
 
 def seller_check(request):
     if not request.user.is_authenticated:
@@ -113,5 +114,19 @@ def delete_product(request , id):
 
 def product_detail(request , id):
     product = Product.objects.get(id=id)
-    return render(request , 'product_detail.html' , {'product':product})
+
+    reviews = Review.objects.filter(product=product , is_approved=True)
+    images = ReviewImage.objects.filter(review__in=reviews)
+
+    total_reviews = reviews.count()
+
+    if total_reviews > 0:
+        avg_rating = sum(review.rating for review in reviews) / total_reviews
+        avg_rating = round(avg_rating , 1)
+    else:
+        avg_rating = 0
+
+    return render(request , 'product_detail.html' , {'product':product,
+                            'reviews':reviews , 'images':images,
+                            'total_reviews':total_reviews , 'avg_rating':avg_rating})
     
