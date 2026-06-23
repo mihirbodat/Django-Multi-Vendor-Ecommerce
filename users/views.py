@@ -22,6 +22,18 @@ def buyer_check(request):
 def home(request):
     products = Product.objects.all()
 
+    for product in products:
+        product.total_reviews = Review.objects.filter(product=product , is_approved=True).count()
+        if product.total_reviews > 0:
+            product.avg_rating = sum(review.rating for review in 
+                        Review.objects.filter(product=product,is_approved=True)) / product.total_reviews
+            product.avg_rating = round(product.avg_rating , 1)
+        else:
+            product.avg_rating = 0
+
+        if request.user.is_authenticated :
+            product.created = Wishlist.objects.filter(user=request.user ,product=product).exists()
+
     paginator = Paginator(products,10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -193,3 +205,37 @@ def review(request , ItemId):
         return redirect('my_orders')
         
     return render(request , 'review.html' , {'order_item':order_item})
+
+def add_to_wishlist(request , id):
+    check = buyer_check(request)
+    if check:
+        return check
+    
+    try:
+        product = Product.objects.get(id=id)
+    except Product.DoesNotExist:
+        messages.error(request , 'Product not found!')
+        return redirect('home')
+
+    wishlist , created = Wishlist.objects.get_or_create(user=request.user , product=product)
+    
+    if created:
+        messages.success(request , 'Added to your Wishlist')
+    else:
+        wishlist.delete()
+        messages.success(request , 'Removed from your Wishlist')
+
+    next = request.GET.get('next')
+    return redirect(next)
+
+
+def wishlist(request):
+    check = buyer_check(request)
+    if check:
+        return check
+    
+    wishlists = Wishlist.objects.filter(user = request.user)
+
+    wishlists.total = wishlists.count()
+
+    return render(request , 'wishlist.html' , {'wishlists': wishlists})

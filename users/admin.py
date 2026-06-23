@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(SellerProfile)
 admin.site.register(Review)
 admin.site.register(ReviewImage)
+admin.site.register(Wishlist)

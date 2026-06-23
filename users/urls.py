@@ -9,4 +9,6 @@ urlpatterns = [
     path('seller_dashboard' , views.seller_dashboard , name='seller_dashboard'),
     path('buyer_search_product' , views.buyer_search_product , name='buyer_search_product'),
     path('review/<int:ItemId>/' , views.review , name='review'),
+    path('add_to_wishlist/<int:id>/' , views.add_to_wishlist , name='add_to_wishlist'),
+    path('wishlist' , views.wishlist , name='wishlist'),
 ]

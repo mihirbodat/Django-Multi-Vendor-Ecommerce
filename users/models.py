@@ -37,3 +37,12 @@ def delete_review_image(sender , instance , **kwargs):
     if instance.image:
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User , on_delete=models.CASCADE)
+    product = models.ForeignKey('products.Product' , on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product}"

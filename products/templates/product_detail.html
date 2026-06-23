@@ -12,6 +12,19 @@
         {% endfor %}
     {% endif %}
     <div class="product_detail">
+        {% if product.created %}
+            <a id="wishlist"
+                data-url="{% url 'add_to_wishlist' product.id %}?next={% url 'product_detail' product.id %}"
+                onclick="toggleWishlist(event , this.dataset.url)" style="cursor: pointer;">
+                ❤️
+            </a>
+        {% else %}
+            <a id="wishlist"
+                data-url="{% url 'add_to_wishlist' product.id %}?next={% url 'product_detail' product.id %}"
+                onclick="toggleWishlist(event , this.dataset.url)" style="cursor: pointer;">
+                🤍
+            </a>
+        {% endif %}
         <img src="{{ product.product_image.url }}" width="800">
         <h2>{{ product.product_name }}</h2>
         <h3>Price:₹{{ product.product_price }}</h3>
@@ -54,6 +67,25 @@
                 section.style.display = 'none'; 
             }
         }
+
+        function toggleWishlist(event , url) {
+            event.preventDefault();
+
+            const scrollPos = window.scrollY;
+            window.location.href = url;
+
+            sessionStorage.setItem('scrollPos' , scrollPos);
+        }
+
+        window.onload = function() {
+            const scrollPos = sessionStorage.getItem('scrollPos');
+
+            if (scrollPos) {
+                window.scrollTo(0 , scrollPos);
+                sessionStorage.removeItem('scrollPos')
+            }
+        }
+
     </script>
 
 </body>

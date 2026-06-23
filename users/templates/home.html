@@ -37,9 +37,10 @@
             </form>
 
             {% if request.user.is_authenticated %}
-            <li><a href="{% url 'logoutuser' %}">LOGOUT</a></li>
             <li><a href="{% url 'cart' %}">🛒Cart</a></li>
-            <li><a href="{% url 'my_orders' %}">Orders</a></li>
+            <li><a href="{% url 'wishlist' %}">💜Wishlist</a></li>
+            <li><a href="{% url 'my_orders' %}">📦Orders</a></li>
+            <li><a href="{% url 'logoutuser' %}">⏻LOGOUT</a></li>
             {% else %}
             <li><a href="{% url 'registeruser' %}">SIGN-UP</a></li>
             <li><a href="{% url 'loginuser' %}">LOGIN</a></li>
@@ -57,11 +58,25 @@
 
         {% for product in page_obj %}
         <div>
+            {% if product.created %}
+                <a
+                    data-url = "{% url 'add_to_wishlist' product.id %}?next=home"
+                    onclick="toggleWishlist(event , this.dataset.url)" style="cursor: pointer;">
+                    ❤️
+                </a>
+            {% else %}
+                <a 
+                    data-url="{% url 'add_to_wishlist' product.id %}?next=home"
+                    onclick="toggleWishlist(event , this.dataset.url)" style="cursor: pointer;">
+                    🤍
+                </a>
+            {% endif %}
             <a href="{% url 'product_detail' product.id %}">
                 <img src="{{ product.product_image.url }}" width="500">
                 <p>{{ product.product_name }}</p>
                 <p>₹{{ product.product_price }}</p>
             </a>
+            <P>{{ product.avg_rating }}⭐ - ({{ product.total_reviews }})</P>
             {% if product.product_stock == 0 %}
             <p>Currently out of stock!</p>
             {% else %}
@@ -91,6 +106,29 @@
     <footer>
         <h3>&#169; All Right Reserved</h3>
     </footer>
+
+    <script>
+        function toggleWishlist(event , url){
+            event.preventDefault();     // prevent page refresh
+
+            const scrollPos = window.scrollY;   // collect scroll position
+
+            window.location.href = url;      // redirect to url
+
+            sessionStorage.setItem('scrollPos' , scrollPos);    // save scroll position in session
+        }
+
+        window.onload = function() {
+            const scrollPos = sessionStorage.getItem('scrollPos');  // collect position
+
+            if (scrollPos){
+                window.scrollTo(0,scrollPos);                   // locate position
+                sessionStorage.removeItem('scrollPos');         // remove sessionStorage item
+            }
+        }
+
+    </script>
+
 </body>
 
 </html>

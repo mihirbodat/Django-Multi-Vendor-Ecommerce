@@ -126,6 +126,9 @@ def product_detail(request , id):
     else:
         avg_rating = 0
 
+    if request.user.is_authenticated:
+        product.created = Wishlist.objects.filter(user=request.user , product=product).exists()
+
     return render(request , 'product_detail.html' , {'product':product,
                             'reviews':reviews , 'images':images,
                             'total_reviews':total_reviews , 'avg_rating':avg_rating})

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist</title>
+</head>
+<body>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <p>My Wishlist ({{ wishlists.total }})</p>
+
+    {% if wishlists %}
+        {% for wishlist in wishlists %}
+            <fieldset>
+                <a href="{% url 'product_detail' wishlist.product.id %}" style="cursor: pointer;">
+                    <img src="{{ wishlist.product.product_image.url }}" width="100">
+                    <p>{{ wishlist.product.product_name }}</p>
+                    <p>₹{{ wishlist.product.product_price }}</p>
+                </a>
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDEyIDE2Ij4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTS0xLjUuNWgxNXYxNWgtMTV6Ii8+CiAgICAgICAgPHBhdGggZmlsbD0iI0MyQzJDMiIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMSAxMy44MzNjMCAuOTE3Ljc1IDEuNjY3IDEuNjY3IDEuNjY3aDYuNjY2Yy45MTcgMCAxLjY2Ny0uNzUgMS42NjctMS42Njd2LTEwSDF2MTB6bTEwLjgzMy0xMi41SDguOTE3TDguMDgzLjVIMy45MTdsLS44MzQuODMzSC4xNjdWM2gxMS42NjZWMS4zMzN6Ii8+CiAgICA8L2c+Cjwvc3ZnPgo=" style="cursor: pointer;"
+                data-url="{% url 'add_to_wishlist' wishlist.product.id %}?next=wishlist"
+                onclick="toggleWishlist(event , this.dataset.url)">
+            </fieldset>
+            
+        {% endfor %}
+    {% else %}
+        <p>You haven't added anything yet</p>
+        <a href="{% url 'home' %}">Shop Now</a>
+    {% endif %}
+
+    <script>
+        function toggleWishlist(event , url) {
+            event.preventDefault();
+
+            const scrollPos = window.scrollY;
+            window.location.href = url;
+
+            sessionStorage.setItem('scrollPos',scrollPos);
+        }
+
+        window.onload = function(){
+            const scrollPos=sessionStorage.getItem('scrollPos');
+
+            if (scrollPos){
+                window.scrollTo(0,scrollPos);
+                sessionStorage.removeItem('scrollPos');
+            }
+        }
+
+    </script>
+    
+</body>
+</html>
