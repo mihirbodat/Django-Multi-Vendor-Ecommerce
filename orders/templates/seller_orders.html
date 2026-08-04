@@ -10,6 +10,12 @@
 <body>
     <section>
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message-box">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <table border="1" style="border-spacing: 10px 15px;">
             <tr>
                 <th>Order ID</th>

@@ -117,16 +117,22 @@ def seller_dashboard(request):
     total_products = Product.objects.filter(seller=seller).count()
     total_orders = OrderItem.objects.filter(seller=seller).count()
     revenue = sum(item.price*item.quantity for item in OrderItem.objects.filter(seller=seller , status='Delivered'))
-    recent_orders = OrderItem.objects.filter(seller=seller).order_by('-id')[:5]
+    recent_orders = OrderItem.objects.filter(seller=seller).order_by('-order__created_at')[:5]
 
     for item in recent_orders:
         item.earnings = item.price * item.quantity
+
+    low_stock_alerts = Product.objects.filter(
+        seller=seller,
+        product_stock__lte = 5
+    ).order_by('product_stock')
 
     return render(request , 'seller_dashboard.html',
                    {'total_products':total_products,
                     'total_orders':total_orders,
                     'revenue':revenue,
-                    'recent_orders':recent_orders})
+                    'recent_orders':recent_orders ,
+                    'low_stock_alerts':low_stock_alerts})
 
 
 def buyer_search_product(request):
@@ -234,7 +240,7 @@ def wishlist(request):
     if check:
         return check
     
-    wishlists = Wishlist.objects.filter(user = request.user)
+    wishlists = Wishlist.objects.filter(user = request.user).order_by('-created_at')
 
     wishlists.total = wishlists.count()
 

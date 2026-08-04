@@ -78,9 +78,9 @@
             </a>
             <P>{{ product.avg_rating }}⭐ - ({{ product.total_reviews }})</P>
             {% if product.product_stock == 0 %}
-            <p>Currently out of stock!</p>
+                <p>Currently out of stock!</p>
             {% else %}
-            <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
+                <a href="{% url 'add_to_cart' product.id %}">Add to cart</a>
             {% endif %}
         </div>
         {% endfor %}

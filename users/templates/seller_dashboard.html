@@ -34,12 +34,52 @@
         <a href="{% url 'seller_products' %}">Manage Products</a>
         <a href="{% url 'seller_orders' %}">View Orders</a>
 
+        {% if low_stock_alerts %}
+            <div class="stock-alert-warning" role="alert">
+                <table border="1">
+                    <tr>
+                        <th colspan="4">⚠️ Inventory Alerts (Low Stock)</th>
+                    </tr>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Current Stock</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                    {% for product in low_stock_alerts %}
+                        <tr>
+                            <td>
+                                <strong>{{ product.product_name }}</strong>
+                            </td>
+                            <td style="text-align: center;">{{ product.product_stock }}</td>
+                            <td>
+                                {% if product.product_stock == 0 %}
+                                <span>🔴 Out of Stock</span>
+                                {% else %}
+                                <span>⚠️ Low Stock</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'edit_product' product.id %}">Restock</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    
+                </table>
+                
+            </div>
+        {% endif %}
+
         <div class="recent_orders">
             <table border="1" style="border-spacing: 10px 15px;">
                 <tr>
+                    <th colspan="6">Recent Orders</th>
+                </tr>
+                <tr>
                     <th>Order ID</th>
                     <th>Product</th>
-                    <th>Buyer</th>
+                    <th>Buyer's Name</th>
                     <th>Status</th>
                     <th>Date</th>
                     <th>Earnings</th>
@@ -49,7 +89,7 @@
                 <tr>
                     <td>#{{ order.order.id }}</td>
                     <td>{{ order.product.product_name }}</td>
-                    <td>{{ order.order.user.username }}</td>
+                    <td style="text-align: center;">{{ order.order.user.username }}</td>
                     <td>{{ order.status }}</td>
                     <td>{{ order.order.created_at }}</td>
                     <td>{{ order.earnings }}</td>

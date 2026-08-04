@@ -21,7 +21,7 @@ def seller_products(request):
     if check:
         return check
 
-    products = Product.objects.filter(seller = request.user.sellerprofile)
+    products = Product.objects.filter(seller = request.user.sellerprofile).order_by('product_stock')
     return render(request , 'seller_products.html' , {'products':products})
 
 

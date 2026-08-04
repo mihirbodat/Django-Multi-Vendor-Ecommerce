@@ -2,6 +2,7 @@ from django.shortcuts import render , redirect
 from .models import *
 from django.contrib import messages
 from users.models import *
+from django.db.models import Case,When,IntegerField
 
 def buyer_check(request):
     if not request.user.is_authenticated:
@@ -32,6 +33,10 @@ def add_to_cart(request , id):
     except Product.DoesNotExist:
         messages.error(request , 'Product does not exist!')
         return redirect('home')
+
+    if product.product_stock <= 0 :
+        messages.error(request , 'Currently out of stock!')
+        return redirect(request.META.get('HTTP_REFERER' , 'home'))
     
     cart , created = Cart.objects.get_or_create(user=request.user)
 
@@ -41,7 +46,7 @@ def add_to_cart(request , id):
         cart_item.quantity +=1
         cart_item.save()
 
-    next = request.GET.get('next')       # cart -> is default value.
+    next = request.GET.get('next')
 
     if next == 'buy_now':
         return redirect('buy_now' , id=cart_item.id)
@@ -56,7 +61,7 @@ def cart(request):
         return check
 
     cart , created= Cart.objects.get_or_create(user = request.user)
-    cart_items = CartItem.objects.filter(cart=cart)
+    cart_items = CartItem.objects.filter(cart=cart).order_by('-id')
 
     for item in cart_items:
         item.subtotal = item.product.product_price*item.quantity
@@ -183,7 +188,7 @@ def my_orders(request):
     if check:
         return check
     
-    orders = Order.objects.filter(user = request.user)
+    orders = Order.objects.filter(user = request.user).order_by('-created_at')
     
     for order in orders:
         order.items = OrderItem.objects.filter(order=order)
@@ -201,7 +206,16 @@ def seller_orders(request):
     if check:
         return check
 
-    order_items = OrderItem.objects.filter(seller=request.user.sellerprofile)
+    order_items = OrderItem.objects.filter(seller=request.user.sellerprofile).annotate(
+        status_order=Case(
+            When(status='Pending' , then=1),
+            When(status='Confirmed' , then=2),
+            When(status='Shipped' , then=3),
+            When(status='Delivered' , then=4),
+            When(status='Cancelled' , then=5),
+            output_field=IntegerField()
+        )
+    ).order_by('status_order' , '-id')
 
     for item in order_items:
         item.subtotal = item.price*item.quantity
@@ -214,7 +228,34 @@ def update_status(request , id):
         return check
     
     order_item = OrderItem.objects.get(id=id)
+    old_status = order_item.status
+    new_status = request.POST['status']
 
-    order_item.status = request.POST['status']
+    product = order_item.product
+
+    if old_status == 'Pending' and new_status == 'Confirmed':
+
+        if product.product_stock < order_item.quantity:
+            messages.error(request , f"⚠️ Only {product.product_stock} stock left!")
+            messages.error(request , f"The ordered quantity is {order_item.quantity} - it cannot be confirmed!")
+            return redirect('seller_orders')
+
+        product.product_stock -= order_item.quantity
+        product.save()
+
+    if old_status == 'Confirmed' and new_status == 'Cancelled':
+        product.product_stock += order_item.quantity
+        product.save()
+
+    if old_status == 'Shipped' and new_status == 'Cancelled':
+        product.product_stock += order_item.quantity
+        product.save()
+
+    if old_status == 'Confirmed' and new_status == 'Pending':
+        product.product_stock += order_item.quantity
+        product.save()
+
+    order_item.status = new_status
+
     order_item.save()
-    return redirect('seller_orders')
+    return redirect('seller_orders') 
