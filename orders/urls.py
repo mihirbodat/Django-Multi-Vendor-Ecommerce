@@ -13,4 +13,6 @@ urlpatterns = [
     path('my_orders',views.my_orders,name='my_orders'),
     path('seller_orders',views.seller_orders,name='seller_orders'),
     path('update_status/<int:id>',views.update_status,name='update_status'),
+    path('cancel_order/<int:id>' ,views.cancel_order , name='cancel_order'),
+    path('acknowledge_cancel/<int:id>' ,views.acknowledge_cancel , name='acknowledge_cancel'),
 ]

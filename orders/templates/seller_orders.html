@@ -16,6 +16,34 @@
             {% endfor %}
         {% endif %}
 
+        {% if buyer_cancelled %}
+        <div>
+            <table class="buyer_cancelled" border="1" style="border-spacing: 10px 15px;">
+                <tr>
+                    <th colspan="5">⚠️ Buyer Cancelled Orders — Action Required!</th>
+                </tr>
+
+                {% for item in buyer_cancelled %}
+                <tr>
+                    <td>#{{  item.order.id }}</td>
+                    <td>{{ item.order.user.username }}</td>
+                    <td>{{ item.product }}</td>
+                    <td>Quantity-{{ item.quantity }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'acknowledge_cancel' item.id %}">
+                            {% csrf_token %}
+                            <button onclick="return confirm('Do you acknowledge it?')">
+                                ✅ OK
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+        {% endif %}
+
         <table border="1" style="border-spacing: 10px 15px;">
             <tr>
                 <th>Order ID</th>
@@ -32,7 +60,7 @@
             <tr>
                 <td>#{{ item.order.id }}</td>
                 <td>{{ item.order.user.username }}</td>
-                <td>{{ item.product.product_name }}</td>
+                <td>{{ item.product }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>₹{{ item.price }} x {{ item.quantity }} = ₹{{ item.subtotal }}</td>
                 <td>{{ item.status }}</td>

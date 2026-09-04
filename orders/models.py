@@ -38,6 +38,10 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10 , decimal_places=2)
     status = models.CharField(max_length=20 , choices=STATUS_CHOICES , default='Pending')
+    CANCELLED_BY_CHOICE = [('Buyer' , 'Buyer'),
+                           ('Seller' , 'Seller'),]
+    cancelled_by = models.CharField(max_length=10 , choices=CANCELLED_BY_CHOICE , null=True , blank=True)
+    is_cancel_acknowledged = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.product.product_name} - {self.quantity}"

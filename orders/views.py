@@ -197,6 +197,7 @@ def my_orders(request):
                 buyer = request.user , 
                 order_item = item
             ).exists()
+            item.subtotal = item.price * item.quantity
 
     return render(request , 'my_orders.html' , {'orders':orders})
 
@@ -206,7 +207,9 @@ def seller_orders(request):
     if check:
         return check
 
-    order_items = OrderItem.objects.filter(seller=request.user.sellerprofile).annotate(
+    seller = request.user.sellerprofile
+
+    order_items = OrderItem.objects.filter(seller=seller).annotate(
         status_order=Case(
             When(status='Pending' , then=1),
             When(status='Confirmed' , then=2),
@@ -217,10 +220,15 @@ def seller_orders(request):
         )
     ).order_by('status_order' , '-id')
 
+    buyer_cancelled = OrderItem.objects.filter(seller=seller ,status = 'Cancelled',
+                                            cancelled_by = 'Buyer' ,is_cancel_acknowledged = False)
+
     for item in order_items:
         item.subtotal = item.price*item.quantity
 
-    return render(request , 'seller_orders.html' , {'order_items':order_items})
+    return render(request , 'seller_orders.html' ,
+                    {'order_items':order_items ,
+                     'buyer_cancelled':buyer_cancelled})
 
 def update_status(request , id):
     check = seller_check(request)
@@ -243,12 +251,12 @@ def update_status(request , id):
         product.product_stock -= order_item.quantity
         product.save()
 
-    if old_status == 'Confirmed' and new_status == 'Cancelled':
-        product.product_stock += order_item.quantity
-        product.save()
+    if old_status == 'Pending' and new_status == 'Cancelled':
+        order_item.cancelled_by = 'Seller'
 
-    if old_status == 'Shipped' and new_status == 'Cancelled':
+    if old_status in ['Confirmed' , 'Shipped'] and new_status == 'Cancelled':
         product.product_stock += order_item.quantity
+        order_item.cancelled_by = 'Seller'
         product.save()
 
     if old_status == 'Confirmed' and new_status == 'Pending':
@@ -259,3 +267,53 @@ def update_status(request , id):
 
     order_item.save()
     return redirect('seller_orders') 
+
+
+def cancel_order(request , id):
+    check = buyer_check(request)
+    if check:
+        return check
+
+    try:
+        order_item = OrderItem.objects.get(id=id)
+    except OrderItem.DoesNotExist:
+        return redirect('my_orders')
+
+    if order_item.order.user != request.user:
+        messages.error(request , "This isn't your order!")
+        return redirect('my_orders')
+
+    if order_item.status not in ['Pending' , 'Confirmed']:
+        messages.error(request , 'Only pending/confirmed orders can be cancelled!')
+        return redirect('my_orders')
+
+    if order_item.status == "Confirmed":
+        order_item.product.product_stock += order_item.quantity
+        order_item.product.save()
+
+    order_item.status = 'Cancelled'
+    order_item.cancelled_by = 'Buyer'
+    order_item.save()
+
+    messages.success(request , 'The order has been cancelled!')
+    return redirect('my_orders')
+
+def acknowledge_cancel(request , id):
+    check = seller_check(request)
+    if check:
+        return check
+
+    try:
+        order_item = OrderItem.objects.get(id=id)
+    except OrderItem.DoesNotExist:
+        return redirect('seller_orders')
+
+    if order_item.seller != request.user.sellerprofile :
+        return redirect('seller_orders')
+
+    order_item.is_cancel_acknowledged = True
+    order_item.save()
+
+    messages.success(request , 'The cancellation has been acknowledged!')
+    return redirect('seller_orders')
+    
