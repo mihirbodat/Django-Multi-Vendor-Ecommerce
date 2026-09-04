@@ -16,15 +16,60 @@
             {% endif %}
 
             {% for order in orders %}
-                <p>Order ID:#{{ order.id }}</p>
-                <p>Date:{{ order.created_at }}</p>
+                <p>Order #{{ order.id }} | {{ order.created_at }}</p>
                 
                 {% for item in order.items %}
                     <a href="{% url 'product_detail' item.product.id %}">
                         <p>{{ item.product.product_name }}</p>
-                        <img src="{{ item.product.product_image.url }}" width="500">
+                        <img src="{{ item.product.product_image.url }}" width="200">
                     </a>
-                    <p>Status:{{ item.status }}</p>
+                    <p>Seller: {{ item.seller }}</p>
+                    <p>Qty: {{ item.quantity }}</p>
+                    <p>Price: ₹{{ item.price }} x {{ item.quantity }} = {{ item.subtotal }}</p>
+                    <p>Status: {{ item.status }}</p>
+
+                    {% if item.status == 'Cancelled' %}
+                        <span>Order Placed</span>
+                        <span>Cancelled</span>
+                    {% else %}
+                        <span>Order Placed</span>
+                        <span>Confirmed</span>
+                        <span>Shipped</span>
+                        <span>Delivered</span>
+                    {% endif %}
+
+                    <p>
+                        ✅  ———
+
+                        {% if item.status == 'Pending' %}
+                            ⏳  ———  ◯  ———  ◯
+
+                        {% elif item.status == 'Confirmed' %}
+                        
+                            ✅  ———  ⏳  ———  ◯
+
+                        {% elif item.status == 'Shipped' %}
+                        
+                            ✅  ———  ✅  ———  ⏳
+
+                        {% elif item.status == 'Delivered' %}
+                        
+                            ✅  ———  ✅  ———  ✅
+
+                        {% elif item.status == 'Cancelled' %}
+                        
+                            🔴
+
+                        {% endif %}
+                    </p>
+
+                    {% if item.status == 'Pending' or item.status == 'Confirmed' %}
+                        <a href="{% url 'cancel_order' item.id %}"
+                            onclick="return confirm('Are you sure? The order will get cancelled!')">
+                            Cancel Order
+                        </a>
+                    {% endif %}
+
                     {% if item.status == "Delivered" %}
                         {% if item.already_reviewed %}
                             <p>✅ Reviewed</p>
@@ -34,8 +79,8 @@
                     {% endif %}
                 {% endfor %}
 
-                <p>Total price:₹{{ order.total_price }}</p>
-
+                <p>Order Total: ₹{{ order.total_price }}</p>
+                <hr>
             {% endfor %}
         {% else %}
             <p>You haven't ordered anything yet.</p>
