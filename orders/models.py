@@ -29,6 +29,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     STATUS_CHOICES = [('Pending','Pending'),
                       ('Confirmed' , 'Confirmed'),
+                      ('Cancellation Requested' , 'cancellation Requested'),
                       ('Shipped' , 'Shipped'),
                       ('Delivered' , 'Delivered'),
                       ('Cancelled' , 'Cancelled'),]
@@ -37,7 +38,7 @@ class OrderItem(models.Model):
     seller = models.ForeignKey(SellerProfile , on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10 , decimal_places=2)
-    status = models.CharField(max_length=20 , choices=STATUS_CHOICES , default='Pending')
+    status = models.CharField(max_length=30 , choices=STATUS_CHOICES , default='Pending')
     CANCELLED_BY_CHOICE = [('Buyer' , 'Buyer'),
                            ('Seller' , 'Seller'),]
     cancelled_by = models.CharField(max_length=10 , choices=CANCELLED_BY_CHOICE , null=True , blank=True)

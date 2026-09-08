@@ -16,14 +16,14 @@
             {% endfor %}
         {% endif %}
 
-        {% if buyer_cancelled %}
+        {% if cancellation_requests %}
         <div>
-            <table class="buyer_cancelled" border="1" style="border-spacing: 10px 15px;">
+            <table class="cancellation_requests" border="1" style="border-spacing: 10px 15px;">
                 <tr>
-                    <th colspan="5">⚠️ Buyer Cancelled Orders — Action Required!</th>
+                    <th colspan="5">⚠️ Orders Cancellation requests from buyer — Action Required!</th>
                 </tr>
 
-                {% for item in buyer_cancelled %}
+                {% for item in cancellation_requests %}
                 <tr>
                     <td>#{{  item.order.id }}</td>
                     <td>{{ item.order.user.username }}</td>

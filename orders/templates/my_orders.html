@@ -28,11 +28,12 @@
                     <p>Price: ₹{{ item.price }} x {{ item.quantity }} = {{ item.subtotal }}</p>
                     <p>Status: {{ item.status }}</p>
 
-                    {% if item.status == 'Cancelled' %}
                         <span>Order Placed</span>
-                        <span>Cancelled</span>
+                    {% if item.status == 'Cancellation Requested' %}
+                        <span>Cancellation Requested</span>
+                    {% elif item.status == 'Cancelled' %}
+                        <span>Cancelled</span>   
                     {% else %}
-                        <span>Order Placed</span>
                         <span>Confirmed</span>
                         <span>Shipped</span>
                         <span>Delivered</span>
@@ -55,6 +56,10 @@
                         {% elif item.status == 'Delivered' %}
                         
                             ✅  ———  ✅  ———  ✅
+
+                        {% elif item.status == 'Cancellation Requested' %}
+
+                            ⏳
 
                         {% elif item.status == 'Cancelled' %}
                         
