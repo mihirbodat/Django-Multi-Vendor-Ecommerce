@@ -59,7 +59,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR , 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,8 +120,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR , 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')      #Django will collect & put all over the static files in root folder to serve.This is for production level
+STATICFILES_DIRS = [os.path.join(BASE_DIR , 'static')]   #Created folder where django can find the all static files for fetch the data.This is for Development level
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR , 'media')
